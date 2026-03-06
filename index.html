@@ -1,45 +1,53 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Web de Noticias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias - Kaos Akustico</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; line-height: 1.6; }
+        article { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        h2 a { color: #333; text-decoration: none; }
+        h2 a:hover { color: #0073aa; }
+        .btn { display: inline-block; background: #0073aa; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 14px; }
+    </style>
 </head>
 <body>
     <h1>Últimas Noticias</h1>
-    <!-- Aquí se insertarán las noticias -->
-    <div id="contenedor-noticias">Cargando noticias...</div>
+    <div id="contenedor-noticias">Cargando noticias de Kaos Akustico...</div>
 
     <script>
-        // Cambia esta URL por la de tu sitio WordPress
-    const urlBase = "https://kaosakustico.com";
-const urlProxy = "https://api.allorigins.win" + encodeURIComponent(urlBase);
+        // La URL debe incluir la ruta completa a los "posts"
+        const apiURL = "https://kaosakustico.com";
 
-async function cargarNoticias() {
-    try {
-        const respuesta = await fetch(urlProxy);
-        const datos = await respuesta.json();
-        // AllOrigins mete la respuesta dentro de una propiedad llamada 'contents'
-        const posts = JSON.parse(datos.contents);
-        
-        const contenedor = document.getElementById('contenedor-noticias');
-        contenedor.innerHTML = '';
+        async function cargarNoticias() {
+            try {
+                const respuesta = await fetch(apiURL);
+                if (!respuesta.ok) throw new Error("Error en el servidor");
+                
+                const posts = await respuesta.json();
+                const contenedor = document.getElementById('contenedor-noticias');
+                contenedor.innerHTML = ''; // Limpiar mensaje de carga
 
-        posts.forEach(post => {
-            const noticia = `
-                <article style="margin-bottom:20px; border-bottom:1px solid #eee;">
-                    <h2><a href="${post.link}" target="_blank">${post.title.rendered}</a></h2>
-                    <div>${post.excerpt.rendered}</div>
-                </article>
-            `;
-            contenedor.innerHTML += noticia;
-        });
-    } catch (error) {
-        console.error("Error:", error);
-        document.getElementById('contenedor-noticias').innerHTML = "Error al conectar. Verifica los enlaces permanentes en WP.";
-    }
-}
-cargarNoticias();
+                posts.forEach(post => {
+                    const noticia = `
+                        <article>
+                            <h2><a href="${post.link}" target="_blank">${post.title.rendered}</a></h2>
+                            <div>${post.excerpt.rendered}</div>
+                            <a href="${post.link}" target="_blank" class="btn">Leer noticia completa</a>
+                        </article>
+                    `;
+                    contenedor.innerHTML += noticia;
+                });
+            } catch (error) {
+                console.error("Error detectado:", error);
+                document.getElementById('contenedor-noticias').innerHTML = 
+                    "<p style='color:red;'>CORS sigue bloqueado o el servidor no responde. Verifica que el plugin Enable CORS esté activo y guardado.</p>";
+            }
+        }
 
+        // Ejecutar la función al cargar la página
+        cargarNoticias();
     </script>
 </body>
 </html>
