@@ -11,33 +11,35 @@
 
     <script>
         // Cambia esta URL por la de tu sitio WordPress
-        const urlAPI = "https://kaosakustico.com";
+    const urlBase = "https://kaosakustico.com";
+const urlProxy = "https://api.allorigins.win" + encodeURIComponent(urlBase);
 
-        async function cargarNoticias() {
-            try {
-                const respuesta = await fetch(urlAPI);
-                const posts = await respuesta.json();
-                
-                const contenedor = document.getElementById('contenedor-noticias');
-                contenedor.innerHTML = ''; // Limpiar mensaje de carga
+async function cargarNoticias() {
+    try {
+        const respuesta = await fetch(urlProxy);
+        const datos = await respuesta.json();
+        // AllOrigins mete la respuesta dentro de una propiedad llamada 'contents'
+        const posts = JSON.parse(datos.contents);
+        
+        const contenedor = document.getElementById('contenedor-noticias');
+        contenedor.innerHTML = '';
 
-                posts.forEach(post => {
-                    const noticia = `
-                        <article>
-                            <h2><a href="${post.link}">${post.title.rendered}</a></h2>
-                            <p>${post.excerpt.rendered}</p>
-                            <hr>
-                        </article>
-                    `;
-                    contenedor.innerHTML += noticia;
-                });
-            } catch (error) {
-                console.error("Error al cargar:", error);
-                document.getElementById('contenedor-noticias').innerHTML = "Error al cargar noticias.";
-            }
-        }
+        posts.forEach(post => {
+            const noticia = `
+                <article style="margin-bottom:20px; border-bottom:1px solid #eee;">
+                    <h2><a href="${post.link}" target="_blank">${post.title.rendered}</a></h2>
+                    <div>${post.excerpt.rendered}</div>
+                </article>
+            `;
+            contenedor.innerHTML += noticia;
+        });
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById('contenedor-noticias').innerHTML = "Error al conectar. Verifica los enlaces permanentes en WP.";
+    }
+}
+cargarNoticias();
 
-        cargarNoticias();
     </script>
 </body>
 </html>
