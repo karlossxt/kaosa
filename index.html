@@ -1,53 +1,43 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias - Kaos Akustico</title>
+    <title>Noticias Kaos Akustico</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; line-height: 1.6; }
-        article { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-        h2 a { color: #333; text-decoration: none; }
-        h2 a:hover { color: #0073aa; }
-        .btn { display: inline-block; background: #0073aa; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 14px; }
+        body { font-family: sans-serif; padding: 20px; }
+        .post { border-bottom: 1px solid #ccc; padding: 15px 0; }
+        h2 { margin: 0; }
     </style>
 </head>
 <body>
-    <h1>Últimas Noticias</h1>
-    <div id="contenedor-noticias">Cargando noticias de Kaos Akustico...</div>
+    <h1>Noticias Actualizadas</h1>
+    <div id="lista">Cargando...</div>
 
     <script>
-        // La URL debe incluir la ruta completa a los "posts"
-        const apiURL = "https://kaosakustico.com";
+        // Usamos un proxy para saltar el bloqueo de HostGator
+        const api = "https://kaosakustico.com";
+        const proxy = "https://api.allorigins.win" + encodeURIComponent(api);
 
-        async function cargarNoticias() {
+        async function traerNoticias() {
             try {
-                const respuesta = await fetch(apiURL);
-                if (!respuesta.ok) throw new Error("Error en el servidor");
+                const res = await fetch(proxy);
+                const data = await res.json();
+                const posts = JSON.parse(data.contents); // El proxy envuelve los datos aquí
                 
-                const posts = await respuesta.json();
-                const contenedor = document.getElementById('contenedor-noticias');
-                contenedor.innerHTML = ''; // Limpiar mensaje de carga
-
-                posts.forEach(post => {
-                    const noticia = `
-                        <article>
-                            <h2><a href="${post.link}" target="_blank">${post.title.rendered}</a></h2>
-                            <div>${post.excerpt.rendered}</div>
-                            <a href="${post.link}" target="_blank" class="btn">Leer noticia completa</a>
-                        </article>
-                    `;
-                    contenedor.innerHTML += noticia;
+                let html = "";
+                posts.forEach(p => {
+                    html += `<div class="post">
+                                <h2>${p.title.rendered}</h2>
+                                <p>${p.excerpt.rendered}</p>
+                                <a href="${p.link}" target="_blank">Leer más</a>
+                             </div>`;
                 });
-            } catch (error) {
-                console.error("Error detectado:", error);
-                document.getElementById('contenedor-noticias').innerHTML = 
-                    "<p style='color:red;'>CORS sigue bloqueado o el servidor no responde. Verifica que el plugin Enable CORS esté activo y guardado.</p>";
+                document.getElementById('lista').innerHTML = html;
+            } catch (e) {
+                document.getElementById('lista').innerHTML = "Error crítico de conexión con el servidor.";
             }
         }
-
-        // Ejecutar la función al cargar la página
-        cargarNoticias();
+        traerNoticias();
     </script>
 </body>
 </html>
