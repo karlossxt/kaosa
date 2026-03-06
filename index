@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Web de Noticias</title>
+</head>
+<body>
+    <h1>Últimas Noticias</h1>
+    <!-- Aquí se insertarán las noticias -->
+    <div id="contenedor-noticias">Cargando noticias...</div>
+
+    <script>
+        // Cambia esta URL por la de tu sitio WordPress
+        const urlAPI = "https://tusitio.com";
+
+        async function cargarNoticias() {
+            try {
+                const respuesta = await fetch(urlAPI);
+                const posts = await respuesta.json();
+                
+                const contenedor = document.getElementById('contenedor-noticias');
+                contenedor.innerHTML = ''; // Limpiar mensaje de carga
+
+                posts.forEach(post => {
+                    const noticia = `
+                        <article>
+                            <h2><a href="${post.link}">${post.title.rendered}</a></h2>
+                            <p>${post.excerpt.rendered}</p>
+                            <hr>
+                        </article>
+                    `;
+                    contenedor.innerHTML += noticia;
+                });
+            } catch (error) {
+                console.error("Error al cargar:", error);
+                document.getElementById('contenedor-noticias').innerHTML = "Error al cargar noticias.";
+            }
+        }
+
+        cargarNoticias();
+    </script>
+</body>
+</html>
