@@ -11,7 +11,7 @@
 
     <script>
         // Cambia esta URL por la de tu sitio WordPress
-        const urlAPI = "https://tusitio.com";
+        const urlAPI = "https://kaosakustico.com";
 
         async function cargarNoticias() {
             try {
